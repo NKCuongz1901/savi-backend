@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum AccountType {
+  EMAIL
+  GOOGLE
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+model User {
+  id       String     @id @default(uuid())
+  fullName String?
+  email    String     @unique
+  password String?
+  status   UserStatus @default(INACTIVE)
+
+  role        Role        @default(USER)
+  accountType AccountType
+  googleId    String?
+  codeID      String?
+  codeExpired DateTime?
+
+  categories   Category[]
+  transactions Transaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id        String          @id @default(uuid())
+  name      String
+  type      TransactionType
+  isDefault Boolean         @default(false)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  transactions Transaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, name, type])
+}
+
+model DefaultCategory {
+  id   String          @id @default(uuid())
+  name String
+  type TransactionType
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  Transaction Transaction[]
+
+  @@unique([name, type])
+}
+
+model Transaction {
+  id     String          @id @default(uuid())
+  type   TransactionType
+  amount Decimal
+  note   String?
+  date   DateTime        @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  defaultCategoryId String?
+  defaultCategory   DefaultCategory? @relation(fields: [defaultCategoryId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

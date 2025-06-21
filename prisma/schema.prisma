@@ -86,8 +86,8 @@ model Transaction {
   userId String
   user   User   @relation(fields: [userId], references: [id])
 
-  categoryId String
-  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id])
 
   defaultCategoryId String?
   defaultCategory   DefaultCategory? @relation(fields: [defaultCategoryId], references: [id])

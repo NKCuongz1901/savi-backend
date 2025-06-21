@@ -6,6 +6,7 @@ import { PrismaService } from './prisma/prisma.service';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { MailModule } from './mail/mail.module';
+import { TransactionModule } from './transaction/transaction.module';
 
 
 @Module({
@@ -16,7 +17,8 @@ import { MailModule } from './mail/mail.module';
     }),
     UserModule, 
     AuthModule, 
-    MailModule
+    MailModule, 
+    TransactionModule
   ],
   controllers: [AppController],
   providers: [PrismaService, AppService],

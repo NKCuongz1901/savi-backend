@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { editTransactionDto } from './dto/edit-transaction';
 
 @Injectable()
 export class TransactionService {
@@ -109,7 +110,60 @@ export class TransactionService {
       data: transactions
     }
   }
-    
+
+  async editTransaction(editTransactionDto: editTransactionDto, transactionId: string) {
+    const { type, amount, note, date, userCategoryId, defaultCategoryId } = editTransactionDto;
+
+    const transaction = await this.prisma.transaction.findUnique({
+      where: { id: transactionId }
+    });
+    if(!transaction){
+      throw new BadRequestException('Transaction not found');
+    }
+
+    const updatedTransaction = await this.prisma.transaction.update({
+      where: {id: transactionId},
+      data:{
+        type,
+        amount,
+        note,
+        date: date || new Date(),
+        category: userCategoryId ? { connect: { id: userCategoryId } } : undefined,
+        defaultCategory: defaultCategoryId ? { connect: { id: defaultCategoryId } } : undefined
+      },
+      include: {
+        category: true,
+        defaultCategory: true
+      }
+    })
+
+    return {
+      message: 'Transaction updated successfully',
+      data: updatedTransaction
+    }
+  }
+
+async deleteTransaction(transactionId: string) {
+  
+  const transaction = await this.prisma.transaction.findUnique({
+    where: {id: transactionId}
+  });
+  if(!transaction){
+    throw new BadRequestException('Transaction not found');
+  }
+
+  const deletedTransaction = await this.prisma.transaction.delete({
+    where: {id: transactionId}
+  })
+
+  return {
+    message: 'Transaction deleted successfully',
+    data: deletedTransaction
+  }
+
+
+}
+  
 
     
   

@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { MailModule } from './mail/mail.module';
 import { TransactionModule } from './transaction/transaction.module';
+import { GeminiModule } from './gemini/gemini.module';
 
 
 @Module({
@@ -18,7 +19,8 @@ import { TransactionModule } from './transaction/transaction.module';
     UserModule, 
     AuthModule, 
     MailModule, 
-    TransactionModule
+    TransactionModule, 
+    GeminiModule
   ],
   controllers: [AppController],
   providers: [PrismaService, AppService],

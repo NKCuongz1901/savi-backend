@@ -15,6 +15,13 @@ export class TransactionController {
     return this.transactionService.createTransaction(createTransactionDto, userId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post('ai-create')
+  createTransactionFromAI(@Body() body: {transcript: string}, @Request() req){
+    const userId = req.user.userId;
+    return this.transactionService.createTransactionFromAI(body.transcript, userId);
+  }
+
 
   @UseGuards(JwtAuthGuard)
   @Get(':userId/transactions')

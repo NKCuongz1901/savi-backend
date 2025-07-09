@@ -2,10 +2,14 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { editTransactionDto } from './dto/edit-transaction';
+import { GeminiService } from 'src/gemini/gemini.service';
 
 @Injectable()
 export class TransactionService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly geminiService: GeminiService
+  ) {}
 
   async createTransaction(createTransactionDto: CreateTransactionDto, userId: string) {
     const { type, amount, note, date, userCategoryId, defaultCategoryId } = createTransactionDto;
@@ -84,6 +88,49 @@ export class TransactionService {
       }
         
     })
+
+    return {
+      message: 'Transaction created successfully',
+      data: transaction
+    }
+  }
+
+  async createTransactionFromAI(transcript: string, userId: string) {
+    const user = await this.prisma.user.findUnique({where: {id: userId}});
+    if(!user){
+      throw new BadRequestException('User not found');
+    }
+
+    const geminiResponse = await this.geminiService.ConvertText(transcript);
+    const convertedData = JSON.parse(geminiResponse ?? '');
+
+    const defaultCategory = await this.prisma.defaultCategory.findFirst({
+      where: {name: convertedData.category}
+    })
+    if(!defaultCategory){
+      throw new BadRequestException('Default category not found');
+    }
+
+    const transactionData = {
+      type: convertedData.type,
+      amount: convertedData.amount,
+      note: convertedData.note,
+      date: new Date(),
+      user: {
+        connect: { id: userId }
+      },
+      defaultCategory: {
+        connect: { id: defaultCategory.id }
+      }
+    };
+
+    const transaction = await this.prisma.transaction.create({
+      data: transactionData,
+      include: {
+        category: true,
+        defaultCategory: true
+      }
+    });
 
     return {
       message: 'Transaction created successfully',

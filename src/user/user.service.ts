@@ -4,12 +4,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { generateRandomCode, getExpirationTime, hashPasswordHelper } from 'src/utils/helpers';
 import { AccountType, UserStatus } from '@prisma/client';
 import { MailService } from 'src/mail/mail.service';
+import { WalletService } from 'src/wallet/wallet.service';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly mailService: MailService
+    private readonly mailService: MailService,
+    private readonly walletService: WalletService
   ) {}
 
   async isEmailExist(email: string) {
@@ -43,6 +45,7 @@ export class UserService {
         codeExpired: expirationTime
       }
     })
+    await this.walletService.createWallet(user.id);
 
     await this.mailService.sendVerificationEmail(fullName, verificationCode, email);
 

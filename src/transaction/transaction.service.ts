@@ -3,12 +3,15 @@ import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { editTransactionDto } from './dto/edit-transaction';
 import { GeminiService } from 'src/gemini/gemini.service';
+import { WalletService } from 'src/wallet/wallet.service';
+import { TransactionType } from '@prisma/client';
 
 @Injectable()
 export class TransactionService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly geminiService: GeminiService
+    private readonly geminiService: GeminiService,
+    private readonly walletService: WalletService
   ) {}
 
   async createTransaction(createTransactionDto: CreateTransactionDto, userId: string) {
@@ -89,6 +92,22 @@ export class TransactionService {
         
     })
 
+    const wallet = await this.walletService.getWallet(userId);
+    if(!wallet){
+      throw new NotFoundException('Wallet not found');
+    }
+    if(type === TransactionType.EXPENSE){
+      await this.walletService.updateWallet(userId, {
+        totalExpense: wallet.data.totalExpense.plus(amount).toNumber(),
+        totalBalance: wallet.data.totalBalance.minus(amount).toNumber()
+      })
+    }else{
+      await this.walletService.updateWallet(userId, {
+        totalIncome: wallet.data.totalIncome.plus(amount).toNumber(),
+        totalBalance: wallet.data.totalBalance.plus(amount).toNumber()
+      })
+    }
+
     return {
       message: 'Transaction created successfully',
       data: transaction
@@ -131,6 +150,22 @@ export class TransactionService {
         defaultCategory: true
       }
     });
+
+    const wallet = await this.walletService.getWallet(userId);
+    if(!wallet){
+      throw new NotFoundException('Wallet not found');
+    }
+    if(convertedData.type === TransactionType.EXPENSE){
+      await this.walletService.updateWallet(userId, {
+        totalExpense: wallet.data.totalExpense.plus(convertedData.amount).toNumber(),
+        totalBalance: wallet.data.totalBalance.minus(convertedData.amount).toNumber()
+      })
+    }else{
+      await this.walletService.updateWallet(userId, {
+        totalIncome: wallet.data.totalIncome.plus(convertedData.amount).toNumber(),
+        totalBalance: wallet.data.totalBalance.plus(convertedData.amount).toNumber()
+      })
+    }
 
     return {
       message: 'Transaction created successfully',

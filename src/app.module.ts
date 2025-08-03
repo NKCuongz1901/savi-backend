@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MailModule } from './mail/mail.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { GeminiModule } from './gemini/gemini.module';
+import { WalletModule } from './wallet/wallet.module';
 
 
 @Module({
@@ -20,7 +21,7 @@ import { GeminiModule } from './gemini/gemini.module';
     AuthModule, 
     MailModule, 
     TransactionModule, 
-    GeminiModule
+    GeminiModule, WalletModule
   ],
   controllers: [AppController],
   providers: [PrismaService, AppService],

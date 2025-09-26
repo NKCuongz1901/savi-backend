@@ -9,6 +9,7 @@ import { MailModule } from './mail/mail.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { GeminiModule } from './gemini/gemini.module';
 import { WalletModule } from './wallet/wallet.module';
+import { CategoryModule } from './category/category.module';
 
 
 @Module({
@@ -21,7 +22,7 @@ import { WalletModule } from './wallet/wallet.module';
     AuthModule, 
     MailModule, 
     TransactionModule, 
-    GeminiModule, WalletModule
+    GeminiModule, WalletModule, CategoryModule
   ],
   controllers: [AppController],
   providers: [PrismaService, AppService],

@@ -173,11 +173,38 @@ export class TransactionService {
     }
   }
 
-  async getAllTransactions(userId:string){
+  async getAllTransactions(
+    userId: string,
+    filters?: {
+      type?: 'INCOME' | 'EXPENSE';
+      createdAtStart?: string;
+      createdAtEnd?: string;
+    }
+  ) {
+    const where: any = {
+      userId: userId
+    };
+
+    if (filters?.type) {
+      where.type = filters.type as TransactionType;
+    }
+
+    if (filters?.createdAtStart || filters?.createdAtEnd) {
+      where.createdAt = {};
+      if (filters.createdAtStart) {
+        const gte = new Date(filters.createdAtStart);
+        if (isNaN(gte.getTime())) throw new BadRequestException('Invalid startDate');
+        where.createdAt.gte = gte;
+      }
+      if (filters.createdAtEnd) {
+        const lte = new Date(filters.createdAtEnd);
+        if (isNaN(lte.getTime())) throw new BadRequestException('Invalid endDate');
+        where.createdAt.lte = lte;
+      }
+    }
+
     const transactions = await this.prisma.transaction.findMany({
-      where:{
-        userId: userId
-      },
+      where,
       include:{
         category: true,
         defaultCategory: true
@@ -185,12 +212,12 @@ export class TransactionService {
       orderBy:{
         date: 'desc'
       }
-    })
+    });
 
     return {
       message: 'Transactions fetched successfully',
       data: transactions
-    }
+    };
   }
 
   async editTransaction(editTransactionDto: editTransactionDto, transactionId: string) {

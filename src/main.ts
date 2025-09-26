@@ -16,7 +16,8 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type, Authorization',
   })
-  await app.listen(port);
+  // await app.listen(port);
+  await app.listen(port, '0.0.0.0');
   console.log("Server is running on port: ", port);
 }
 bootstrap();

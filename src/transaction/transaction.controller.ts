@@ -40,6 +40,12 @@ export class TransactionController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get(':transactionId')
+  getTransactionById(@Param('transactionId') transactionId: string) {
+    return this.transactionService.getTransactionById(transactionId);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Patch(':transactionId')
   editTransaction(@Body() editTransactionDto: editTransactionDto, @Param('transactionId') transactionId: string) {
     return this.transactionService.editTransaction(editTransactionDto, transactionId);

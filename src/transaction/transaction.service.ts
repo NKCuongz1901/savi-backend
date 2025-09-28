@@ -220,6 +220,19 @@ export class TransactionService {
     };
   }
 
+  async getTransactionById(transactionId: string) {
+    const transaction = await this.prisma.transaction.findUnique({
+      where: { id: transactionId }
+    });
+    if(!transaction){
+      throw new BadRequestException('Transaction not found');
+    }
+    return {
+      message: 'Transaction fetched successfully',
+      data: transaction
+    }
+  }
+
   async editTransaction(editTransactionDto: editTransactionDto, transactionId: string) {
     const { type, amount, note, date, userCategoryId, defaultCategoryId } = editTransactionDto;
 
@@ -245,6 +258,23 @@ export class TransactionService {
         defaultCategory: true
       }
     })
+
+    const wallet = await this.walletService.getWallet(transaction.userId);
+    if(!wallet){
+      throw new NotFoundException('Wallet not found');
+    }
+    if(type === TransactionType.EXPENSE){
+      await this.walletService.updateWallet(transaction.userId, {
+        totalExpense: wallet.data.totalExpense.plus(amount).toNumber(),
+        totalBalance: wallet.data.totalBalance.minus(amount).toNumber()
+      })
+    }
+    else{
+      await this.walletService.updateWallet(transaction.userId, {
+        totalIncome: wallet.data.totalIncome.plus(amount).toNumber(),
+        totalBalance: wallet.data.totalBalance.plus(amount).toNumber()
+      })
+    }
 
     return {
       message: 'Transaction updated successfully',

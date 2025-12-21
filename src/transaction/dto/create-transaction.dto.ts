@@ -1,6 +1,6 @@
 import { TransactionType } from "@prisma/client";
 import { Transform } from "class-transformer";
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl } from "class-validator";
 
 export class CreateTransactionDto {
     
@@ -20,6 +20,15 @@ export class CreateTransactionDto {
     date?: Date;
 
    
+    @IsOptional()
+    @IsUrl()
+    imageUrl?: string;
+
+    @IsOptional()
+    @IsString()
+    imageData?: string;
+
+    
     @IsOptional()
     @IsString()
     userCategoryId?: string; 

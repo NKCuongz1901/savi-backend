@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -13,9 +21,39 @@ export class UserController {
   }
 
   @Post('verify')
-  verifyEmail(@Body('code') code: string) {
-    return this.userService.verifyEmail(code);
+  verifyEmail(@Body() body: { email: string; code: string }) {
+    return this.userService.verifyEmail(body.code, body.email);
   }
 
-  
+  @Post('change-password')
+  changePassword(
+    @Body()
+    body: {
+      userEmail: string;
+      oldPassword: string;
+      newPassword: string;
+    },
+  ) {
+    return this.userService.changePassword(
+      body.userEmail,
+      body.newPassword,
+      body.oldPassword,
+    );
+  }
+
+  @Post('forgot-password')
+  async forgotPassword(@Body() body: { email: string }) {
+    return this.userService.requestPasswordReset(body.email);
+  }
+
+  @Post('reset-password')
+  async resetPassword(
+    @Body() body: { email: string; code: string; newPassword: string },
+  ) {
+    return this.userService.resetPassword(
+      body.email,
+      body.code,
+      body.newPassword,
+    );
+  }
 }

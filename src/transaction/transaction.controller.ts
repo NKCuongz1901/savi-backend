@@ -30,12 +30,16 @@ export class TransactionController {
     @Query('type') type?: 'INCOME' | 'EXPENSE',
     @Query('createdAtStart') createdAtStart?: string,
     @Query('createdAtEnd') createdAtEnd?: string,
+    @Query('categoryId') categoryId?: string,
+    @Query('defaultCategoryId') defaultCategoryId?: string,
   ) {
     const userId = req.user.userId;
     return this.transactionService.getAllTransactions(userId, {
       type,
       createdAtStart,
       createdAtEnd,
+      categoryId,
+      defaultCategoryId,
     });
   }
 

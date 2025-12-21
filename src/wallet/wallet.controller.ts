@@ -15,5 +15,12 @@ export class WalletController {
     return this.walletService.getWallet(userId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  createWallet(@Request() req:any) {
+    const userId = req.user.userId;
+    return this.walletService.createWallet(userId);
+  }
+
   
 }

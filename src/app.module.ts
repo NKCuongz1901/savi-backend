@@ -10,6 +10,8 @@ import { TransactionModule } from './transaction/transaction.module';
 import { GeminiModule } from './gemini/gemini.module';
 import { WalletModule } from './wallet/wallet.module';
 import { CategoryModule } from './category/category.module';
+import { UserCategoryModule } from './user-category/user-category.module';
+import { BudgetCategoryModule } from './budget-category/budget-category.module';
 
 
 @Module({
@@ -22,7 +24,7 @@ import { CategoryModule } from './category/category.module';
     AuthModule, 
     MailModule, 
     TransactionModule, 
-    GeminiModule, WalletModule, CategoryModule
+    GeminiModule, WalletModule, CategoryModule, UserCategoryModule, BudgetCategoryModule
   ],
   controllers: [AppController],
   providers: [PrismaService, AppService],
